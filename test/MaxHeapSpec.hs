@@ -5,9 +5,28 @@ import Test.QuickCheck
 import Control.Exception (evaluate)
 
 import MaxHeap
+import Control.Monad (replicateM, liftM)
 
 main :: IO ()
 main = hspec spec
+
+instance Arbitrary a => Arbitrary (Tree a) where
+  arbitrary = sized arbTree
+
+
+-- To test, cabal repl test, import Test.QuickCheck, then ...
+-- sample (arbitrary :: Gen (MaxHeap.Tree Int))
+arbTree :: Arbitrary a => Int -> Gen (Tree a)
+arbTree 0 = return Empty
+arbTree n = do
+              (Positive m) <- arbitrary
+              let n' = n `div` (m + 1)
+              (Positive m) <- arbitrary
+              let n'' = n `div` (m + 1)
+              l <- (arbTree n')
+              a <- arbitrary
+              r <- (arbTree n'')
+              return $ Branch l a r
 
 spec :: Spec
 spec = do
