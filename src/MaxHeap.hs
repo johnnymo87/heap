@@ -7,6 +7,6 @@ extractNumber :: Tree a -> [a]
 extractNumber Empty          = []
 extractNumber (Branch _ a _) = [a]
 
-extractNumbers :: Tree a -> [a]
-extractNumbers Empty          = []
-extractNumbers (Branch l _ r) = (extractNumber l) ++ (extractNumber r)
+hasHeapProperty :: (Ord a) => Tree a -> Bool
+hasHeapProperty Empty          = True
+hasHeapProperty (Branch l i r) = all (\a -> i >= a) ((extractNumber l) ++ (extractNumber r)) && (hasHeapProperty l) && (hasHeapProperty r)
