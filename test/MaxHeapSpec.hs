@@ -19,23 +19,17 @@ instance Arbitrary a => Arbitrary (Tree a) where
 -- sample (arbitrary :: Gen (MaxHeap.Tree Int))
 arbTree :: Arbitrary a => Int -> Gen (Tree a)
 arbTree 0 = return Empty
-arbTree n = do
-              (Positive m) <- arbitrary
-              let n' = n `div` (m + 1)
-              (Positive m) <- arbitrary
-              let n'' = n `div` (m + 1)
-              l <- (arbTree n')
-              a <- arbitrary
-              r <- (arbTree n'')
-              return $ Branch a l r
+arbTree n = Branch <$> arbitrary <*> subtree <*> subtree
+  where subtree = do
+          Positive m <- arbitrary
+          let n' = n `div` (m + 1)
+          arbTree n'
 
--- toDataTree :: Show a => MaxHeap.Tree a -> Data.Tree.Tree String
 toDataTree Empty          = Node (show ".") []
 toDataTree (Branch a l r) = Node (show a) [toDataTree l, toDataTree r]
 
-printTree = fmap toDataTree (arbitrary :: Gen (MaxHeap.Tree Int))
-printTree' = fmap drawTree printTree
-printTree'' = sample printTree'
+printTree = samples >>= mapM_ putStrLn
+  where samples = sample' $ drawTree . toDataTree <$> (arbitrary ::  Gen (MaxHeap.Tree Int))
 
 spec :: Spec
 spec = do
