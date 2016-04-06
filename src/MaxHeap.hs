@@ -20,4 +20,4 @@ extractNumber (Branch a _ _) = [a]
 hasHeapProperty :: (Ord a) => Tree a -> Bool
 hasHeapProperty Empty          = True
 hasHeapProperty (Leaf _)       = True
-hasHeapProperty (Branch i l r) = all (\a -> i >= a) ((extractNumber l) ++ (extractNumber r)) && (hasHeapProperty l) && (hasHeapProperty r)
+hasHeapProperty (Branch a l r) = all (a >=) ((extractNumber l) ++ (extractNumber r)) && (hasHeapProperty l) && (hasHeapProperty r)
