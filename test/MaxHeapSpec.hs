@@ -17,7 +17,6 @@ instance Arbitrary a => Arbitrary (Tree a) where
 
 arbTree :: Arbitrary a => Int -> Gen (Tree a)
 arbTree 0 = return Empty
-arbTree 1 = Leaf <$> arbitrary
 arbTree n = Branch <$> arbitrary <*> subtree <*> subtree
   where subtree = do
           Positive m <- arbitrary
@@ -29,7 +28,6 @@ arbTree n = Branch <$> arbitrary <*> subtree <*> subtree
 arb = arbitrary :: Gen (MaxHeap.Tree Int)
 
 toDataTree Empty          = Node (show ".") []
-toDataTree (Leaf a)       = Node (show a) []
 toDataTree (Branch a l r) = Node (show a) [toDataTree l, toDataTree r]
 
 -- for pretty-printing fun
@@ -43,7 +41,6 @@ safeInit (x : xs) = [x]
 -- sample $ arb >>= extractLine
 extractLine :: Tree a -> Gen [a]
 extractLine Empty          = return []
-extractLine (Leaf a)       = return [a]
 extractLine (Branch a l r) = joinLeaves (return [a]) (safeInit <$> shuffleLeaves l r)
   where
     shuffleLeaves x y = joinLeaves (extractLine x) (extractLine y) >>= shuffle
