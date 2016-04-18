@@ -18,10 +18,11 @@ instance Arbitrary a => Arbitrary (Tree a) where
 arbTree :: Arbitrary a => Int -> Gen (Tree a)
 arbTree 0 = return Empty
 arbTree n = Branch <$> arbitrary <*> subtree <*> subtree
-  where subtree = do
-          Positive m <- arbitrary
-          let n' = n `div` (m + 1)
-          arbTree n'
+  where subtree = arbitrary >>= \m -> arbTree $ n `div` ((abs m :: Int) + 1)
+  -- where subtree = do
+  --         Positive m <- arbitrary
+  --         let n' = n `div` (m + 1)
+  --         arbTree n'
 
 -- To test, cabal repl spec, import Test.QuickCheck, then ...
 -- sample arb
