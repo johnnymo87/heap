@@ -15,6 +15,15 @@ main = hspec spec
 instance Arbitrary a => Arbitrary (Tree a) where
   arbitrary = sized arbTree
 
+  shrink Empty = []
+  shrink (Branch a l r) =
+    -- shrink Branch to Nil
+    [Empty] ++
+    -- shrink to subterms
+    [l, r] ++
+    -- recursively shrink subterms
+    [Branch a' l' r' | (a', l', r') <- shrink (a, l, r)]
+
 arbTree :: Arbitrary a => Int -> Gen (Tree a)
 arbTree 0 = return Empty
 arbTree n = Branch <$> arbitrary <*> subtree <*> subtree
